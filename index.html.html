@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Analytics - Wide Layout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6b7280 0%, #1f2937 50%, #111827 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 95vw;
+            max-width: 1400px;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: 2.0em;
+            font-weight: 300;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4ade80;
+            margin-bottom: 8px;
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        button {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1.0em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.5;
+        }
+
+        .email-button {
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+            width: 180px;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .status.active {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+        }
+
+        .status.inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .feedback-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ef4444, #fbbf24, #4ade80, #fbbf24, #ef4444);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 5px;
+        }
+
+        .feedback-text {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin: 8px 0;
+            padding: 6px 10px;
+            border-radius: 15px;
+            text-align: center;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .markers {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            padding: 0 3px;
+        }
+
+        .marker {
+            text-align: center;
+            font-size: 0.65em;
+            font-weight: bold;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+            flex: 1;
+            padding: 3px;
+            border-radius: 5px;
+            margin: 0 1px;
+            border: 1px solid transparent;
+        }
+
+        .marker.active {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .marker-label {
+            font-size: 0.7em;
+            margin-bottom: 1px;
+        }
+
+        .marker-icon {
+            font-size: 0.9em;
+        }
+
+        .red-marker {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .red-marker.active {
+            background: rgba(239, 68, 68, 0.3);
+            border-color: #ef4444;
+        }
+
+        .green-marker {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+            border-color: rgba(74, 222, 128, 0.3);
+        }
+
+        .green-marker.active {
+            background: rgba(74, 222, 128, 0.3);
+            border-color: #4ade80;
+        }
+
+        .yellow-marker {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        .yellow-marker.active {
+            background: rgba(251, 191, 36, 0.3);
+            border-color: #fbbf24;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .container {
+                width: 98vw;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LiM</h1>
+        
+        <div class="metrics">
+            <!-- DECIBEL METER -->
+            <div class="metric">
+                <div class="metric-label">Decibel Level</div>
+                <div class="metric-value" id="decibelValue">0 dB</div>
+                <div class="feedback-text" id="volumeFeedback" style="background: rgba(239, 68, 68, 0.3); color: #ff6b6b; border-color: #ef4444;">
+                    🔇 TOO QUIET
+                </div>
+                <div class="feedback-bar">
+                    <div class="bar-fill" id="decibelBar"></div>
+                </div>
+                <div class="markers">
+                    <div class="marker red-marker" id="volumeQuietMarker">
+                        <div class="marker-label">QUIET</div>
+                        <div class="marker-icon">🔇</div>
+                    </div>
+                    <div class="marker green-marker" id="volumePerfectMarker">
+                        <div class="marker-label">PERFECT</div>
+                        <div class="marker-icon">✅</div>
+                    </div>
+                    <div class="marker yellow-marker" id="volumeLoudMarker">
+                        <div class="marker-label">LOUD</div>
+                        <div class="marker-icon">📢</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- WORDS PER MINUTE METER -->
+            <div class="metric">
+                <div class="metric-label">Words Per Minute</div>
+                <div class="metric-value" id="wpmValue">0</div>
+                <div class="feedback-text" id="wpmFeedback" style="background: rgba(100, 100, 100, 0.3); color: #999; border-color: #666;">
+                    ⏸️ NOT SPEAKING
+                </div>
+                <div class="feedback-bar">
+                    <div class="bar-fill" id="wpmBar"></div>
+                </div>
+                <div class="markers">
+                    <div class="marker red-marker" id="wpmSlowMarker">
+                        <div class="marker-label">SLOW</div>
+                        <div class="marker-icon">🐌</div>
+                    </div>
+                    <div class="marker green-marker" id="wpmPerfectMarker">
+                        <div class="marker-label">PERFECT</div>
+                        <div class="marker-icon">✅</div>
+                    </div>
+                    <div class="marker yellow-marker" id="wpmFastMarker">
+                        <div class="marker-label">FAST</div>
+                        <div class="marker-icon">🏃</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TALK TIME -->
+            <div class="metric">
+                <div class="metric-label">Talk Time</div>
+                <div class="metric-value" id="talkTime">00:00</div>
+                <div style="height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.8em; opacity: 0.7;">
+                    Resets when silent
+                </div>
+                <div style="height: 10px; margin-top: 8px;"></div>
+                <div style="height: 20px; margin-top: 6px;"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="window.appController.startApp()">Start Monitoring</button>
+            <button onclick="window.appController.stopApp()" disabled id="stopBtn">Stop</button>
+            <button onclick="window.appController.resetApp()">Reset</button>
+            <button id="emailBtn" class="email-button" onclick="window.appController.showEmail()" disabled>📧 Email Word Cloud</button>
+        </div>
+
+        <div class="status inactive" id="status">Click "Start Monitoring" to begin</div>
+    </div>
+
+    <script>
+        console.log('📱 Loading Call Analytics App...');
+
+        // App Controller Class
+        class AppController {
+            constructor() {
+                this.audioContext = null;
+                this.analyser = null;
+                this.microphone = null;
+                this.recognition = null;
+                this.isMonitoring = false;
+                this.startTime = 0;
+                this.wordCount = 0;
+                this.talkTimeSeconds = 0;
+                this.lastSpeechTime = 0;
+                this.allSpokenText = '';
+                this.wordFrequency = {};
+                this.sessionStartTime = null;
+                this.timerInterval = null;
+                this.animationFrame = null;
+                
+                // Rolling window for WPM calculation
+                this.recentWords = [];
+                this.windowSizeMinutes = 1; // 1-minute rolling window
+                this.currentWPM = 0;
+                this.wpmUpdateInterval = null;
+            }
+
+            async startApp() {
+                console.log('🚀 START BUTTON CLICKED!');
+                
+                try {
+                    // Check for browser support
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('Your browser does not support microphone access');
+                    }
+
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    console.log('✅ Microphone access granted');
+                    
+                    // Setup audio context
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.analyser.fftSize = 256;
+                    this.microphone = this.audioContext.createMediaStreamSource(stream);
+                    this.microphone.connect(this.analyser);
+                    
+                    // Setup speech recognition
+                    this.setupSpeechRecognition();
+                    
+                    this.isMonitoring = true;
+                    this.startTime = Date.now();
+                    this.sessionStartTime = new Date();
+                    this.allSpokenText = '';
+                    this.wordFrequency = {};
+                    this.lastSpeechTime = Date.now();
+                    this.recentWords = []; // Clear any existing words
+                    this.currentWPM = 0;
+                    
+                    this.updateUI(true);
+                    this.monitorAudio();
+                    this.updateTimer();
+                    this.startWPMUpdater();
+                    
+                } catch (error) {
+                    console.error('❌ Error:', error);
+                    alert('Error: ' + error.message);
+                }
+            }
+
+            setupSpeechRecognition() {
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    console.warn('⚠️ Speech recognition not supported in this browser');
+                    return;
+                }
+
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRecognition();
+                this.recognition.continuous = true;
+                this.recognition.interimResults = true;
+                this.recognition.lang = 'en-US';
+                
+                let lastTranscript = '';
+                
+                this.recognition.onresult = (event) => {
+                    try {
+                        let fullText = '';
+                        for (let i = 0; i < event.results.length; i++) {
+                            if (event.results[i].isFinal) {
+                                fullText += event.results[i][0].transcript;
+                            }
+                        }
+                        
+                        if (fullText.length > lastTranscript.length) {
+                            const newText = fullText.substring(lastTranscript.length).trim();
+                            if (newText) {
+                                this.processNewWords(newText);
+                                lastTranscript = fullText;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error processing speech result:', error);
+                    }
+                };
+                
+                this.recognition.onstart = () => {
+                    console.log('✅ Speech recognition started successfully');
+                };
+                
+                this.recognition.onend = () => {
+                    console.log('⚠️ Speech recognition ended');
+                    if (this.isMonitoring) {
+                        setTimeout(() => { 
+                            try { 
+                                this.recognition.start(); 
+                                console.log('🔄 Restarted speech recognition');
+                            } catch(e) { 
+                                console.log('❌ Failed to restart:', e);
+                            } 
+                        }, 1000);
+                    }
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.log('❌ Speech recognition error:', event.error);
+                };
+                
+                try {
+                    this.recognition.start();
+                    console.log('🎤 Speech recognition started');
+                } catch (error) {
+                    console.error('Failed to start speech recognition:', error);
+                }
+            }
+
+            processNewWords(newText) {
+                this.allSpokenText += (this.allSpokenText ? ' ' : '') + newText;
+                const words = newText.split(/\s+/).filter(w => w.length > 0);
+                this.wordCount += words.length;
+                
+                // Add words to rolling window with timestamp
+                const currentTime = Date.now();
+                words.forEach(word => {
+                    this.recentWords.push({
+                        word: word,
+                        timestamp: currentTime
+                    });
+                    
+                    const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+                    if (cleanWord.length > 1) {
+                        this.wordFrequency[cleanWord] = (this.wordFrequency[cleanWord] || 0) + 1;
+                    }
+                });
+                
+                console.log('🔄 Added', words.length, 'words. Total recent words:', this.recentWords.length);
+                this.updateWPM();
+            }
+
+            stopApp() {
+                this.isMonitoring = false;
+                
+                // Clear intervals and animation frames
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+                
+                if (this.wpmUpdateInterval) {
+                    clearInterval(this.wpmUpdateInterval);
+                    this.wpmUpdateInterval = null;
+                }
+                
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                    this.animationFrame = null;
+                }
+                
+                // Close audio context
+                if (this.audioContext && this.audioContext.state !== 'closed') {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+                
+                // Stop speech recognition
+                if (this.recognition) {
+                    this.recognition.stop();
+                    this.recognition = null;
+                }
+                
+                this.updateUI(false);
+                
+                if (this.allSpokenText.trim()) {
+                    const emailBtn = document.getElementById('emailBtn');
+                    if (emailBtn) emailBtn.disabled = false;
+                }
+            }
+
+            resetApp() {
+                this.wordCount = 0;
+                this.talkTimeSeconds = 0;
+                this.startTime = Date.now();
+                this.allSpokenText = '';
+                this.wordFrequency = {};
+                this.lastSpeechTime = Date.now();
+                this.recentWords = [];
+                this.currentWPM = 0;
+                
+                // Reset UI elements
+                const elements = {
+                    'wpmValue': '0',
+                    'talkTime': '00:00',
+                    'decibelValue': '0 dB'
+                };
+                
+                Object.entries(elements).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) element.textContent = value;
+                });
+                
+                const bars = ['decibelBar', 'wpmBar'];
+                bars.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.style.width = '0%';
+                });
+                
+                const emailBtn = document.getElementById('emailBtn');
+                if (emailBtn) emailBtn.disabled = true;
+                
+                // Reset feedback
+                const volumeFeedback = document.getElementById('volumeFeedback');
+                if (volumeFeedback) volumeFeedback.textContent = '🔇 TOO QUIET';
+                
+                const wpmFeedback = document.getElementById('wpmFeedback');
+                if (wpmFeedback) wpmFeedback.textContent = '⏸️ NOT SPEAKING';
+                
+                // Remove active markers
+                document.querySelectorAll('.marker').forEach(m => m.classList.remove('active'));
+            }
+
+            monitorAudio() {
+                if (!this.isMonitoring || !this.analyser) return;
+                
+                const bufferLength = this.analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                this.analyser.getByteFrequencyData(dataArray);
+                
+                let sum = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / bufferLength;
+                const volume = Math.min(100, (average / 128) * 100);
+                
+                const decibelDisplay = volume > 5 ? Math.round(30 + (volume / 100) * 60) : 0;
+                const decibelElement = document.getElementById('decibelValue');
+                const decibelBar = document.getElementById('decibelBar');
+                
+                if (decibelElement) decibelElement.textContent = decibelDisplay + ' dB';
+                if (decibelBar) decibelBar.style.width = volume + '%';
+                
+                this.updateVolumeFeedback(volume);
+                
+                if (volume > 10) {
+                    this.lastSpeechTime = Date.now();
+                }
+                
+                this.animationFrame = requestAnimationFrame(() => this.monitorAudio());
+            }
+
+            updateVolumeFeedback(volume) {
+                const feedback = document.getElementById('volumeFeedback');
+                if (!feedback) return;
+                
+                const markers = ['volumeQuietMarker', 'volumePerfectMarker', 'volumeLoudMarker'];
+                markers.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.classList.remove('active');
+                });
+                
+                if (volume < 20) {
+                    feedback.textContent = '🔇 TOO QUIET';
+                    feedback.style.background = 'rgba(239, 68, 68, 0.3)';
+                    feedback.style.color = '#ff6b6b';
+                    feedback.style.borderColor = '#ef4444';
+                    const marker = document.getElementById('volumeQuietMarker');
+                    if (marker) marker.classList.add('active');
+                } else if (volume <= 70) {
+                    feedback.textContent = '✅ PERFECT';
+                    feedback.style.background = 'rgba(74, 222, 128, 0.3)';
+                    feedback.style.color = '#4ade80';
+                    feedback.style.borderColor = '#22c55e';
+                    const marker = document.getElementById('volumePerfectMarker');
+                    if (marker) marker.classList.add('active');
+                } else {
+                    feedback.textContent = '📢 TOO LOUD';
+                    feedback.style.background = 'rgba(251, 191, 36, 0.3)';
+                    feedback.style.color = '#fbbf24';
+                    feedback.style.borderColor = '#f59e0b';
+                    const marker = document.getElementById('volumeLoudMarker');
+                    if (marker) marker.classList.add('active');
+                }
+            }
+
+            updateWPM() {
+                const currentTime = Date.now();
+                const windowMs = this.windowSizeMinutes * 60 * 1000; // 1 minute = 60,000ms
+                
+                // Remove words older than the window
+                this.recentWords = this.recentWords.filter(wordObj => 
+                    currentTime - wordObj.timestamp <= windowMs
+                );
+                
+                // Calculate WPM
+                if (this.recentWords.length === 0) {
+                    this.currentWPM = 0;
+                } else {
+                    // If we have less than 1 minute of data, calculate based on actual time elapsed
+                    const oldestTime = Math.min(...this.recentWords.map(w => w.timestamp));
+                    const timeElapsedMs = currentTime - oldestTime;
+                    const timeElapsedMinutes = Math.max(timeElapsedMs / 60000, 0.1); // Minimum 6 seconds
+                    
+                    this.currentWPM = Math.round(this.recentWords.length / timeElapsedMinutes);
+                    
+                    // Cap at reasonable maximum
+                    this.currentWPM = Math.min(this.currentWPM, 300);
+                }
+                
+                // Update display
+                const wpmElement = document.getElementById('wpmValue');
+                if (wpmElement) wpmElement.textContent = this.currentWPM;
+                
+                console.log('📊 NEW WPM Debug:', {
+                    recentWordsCount: this.recentWords.length,
+                    windowMs: windowMs,
+                    currentWPM: this.currentWPM,
+                    oldestWordAge: this.recentWords.length > 0 ? currentTime - Math.min(...this.recentWords.map(w => w.timestamp)) : 0
+                });
+                
+                this.updateWPMFeedback(this.currentWPM);
+            }
+
+            startWPMUpdater() {
+                // Update WPM every 1 second for responsive feedback
+                this.wpmUpdateInterval = setInterval(() => {
+                    if (this.isMonitoring) {
+                        this.updateWPM();
+                    }
+                }, 1000);
+            }
+
+            updateWPMFeedback(wpm) {
+                const feedback = document.getElementById('wpmFeedback');
+                const wpmBar = document.getElementById('wpmBar');
+                
+                if (!feedback || !wpmBar) return;
+                
+                const markers = ['wpmSlowMarker', 'wpmPerfectMarker', 'wpmFastMarker'];
+                markers.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) element.classList.remove('active');
+                });
+                
+                const wpmPercentage = Math.min(100, (wpm / 250) * 100);
+                wpmBar.style.width = wpmPercentage + '%';
+                
+                if (wpm === 0) {
+                    feedback.textContent = '⏸️ NOT SPEAKING';
+                    feedback.style.background = 'rgba(100, 100, 100, 0.3)';
+                    feedback.style.color = '#999';
+                    feedback.style.borderColor = '#666';
+                } else if (wpm < 120) {
+                    feedback.textContent = '🐌 TOO SLOW';
+                    feedback.style.background = 'rgba(239, 68, 68, 0.3)';
+                    feedback.style.color = '#ff6b6b';
+                    feedback.style.borderColor = '#ef4444';
+                    const marker = document.getElementById('wpmSlowMarker');
+                    if (marker) marker.classList.add('active');
+                } else if (wpm <= 150) {
+                    feedback.textContent = '✅ PERFECT';
+                    feedback.style.background = 'rgba(74, 222, 128, 0.3)';
+                    feedback.style.color = '#4ade80';
+                    feedback.style.borderColor = '#22c55e';
+                    const marker = document.getElementById('wpmPerfectMarker');
+                    if (marker) marker.classList.add('active');
+                } else {
+                    feedback.textContent = '🏃 TOO FAST';
+                    feedback.style.background = 'rgba(251, 191, 36, 0.3)';
+                    feedback.style.color = '#fbbf24';
+                    feedback.style.borderColor = '#f59e0b';
+                    const marker = document.getElementById('wpmFastMarker');
+                    if (marker) marker.classList.add('active');
+                }
+                
+                console.log('✅ WPM feedback updated:', feedback.textContent, 'Bar width:', wpmPercentage + '%');
+            }
+
+            updateTimer() {
+                if (!this.isMonitoring) return;
+                
+                const timeSinceLastSpeech = Date.now() - this.lastSpeechTime;
+                
+                if (timeSinceLastSpeech < 2000) {
+                    this.talkTimeSeconds++;
+                } else if (timeSinceLastSpeech > 3000) {
+                    this.talkTimeSeconds = 0;
+                }
+                
+                const minutes = Math.floor(this.talkTimeSeconds / 60);
+                const seconds = this.talkTimeSeconds % 60;
+                const timeElement = document.getElementById('talkTime');
+                
+                if (timeElement) {
+                    timeElement.textContent = 
+                        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+                }
+                
+                this.timerInterval = setTimeout(() => this.updateTimer(), 1000);
+            }
+
+            updateUI(isActive) {
+                const startBtn = document.querySelector('button[onclick*="startApp"]');
+                const stopBtn = document.getElementById('stopBtn');
+                const status = document.getElementById('status');
+                
+                if (startBtn) startBtn.disabled = isActive;
+                if (stopBtn) stopBtn.disabled = !isActive;
+                
+                if (status) {
+                    if (isActive) {
+                        status.textContent = 'Monitoring Active!';
+                        status.className = 'status active';
+                    } else {
+                        status.textContent = 'Session Complete!';
+                        status.className = 'status inactive';
+                    }
+                }
+            }
+
+            showEmail() {
+                if (!this.allSpokenText.trim()) {
+                    alert('No speech data available. Please record first.');
+                    return;
+                }
+                
+                const email = prompt('Enter your email address:');
+                if (!email || !email.includes('@')) {
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+                
+                this.generateVisualWordCloudEmail(email);
+            }
+
+            generateVisualWordCloudEmail(email) {
+                const duration = Math.max(1, Math.round((Date.now() - this.startTime) / 60000));
+                const avgWPM = Math.round(this.wordCount / Math.max(duration / 60, 0.1));
+                
+                const fillerWords = ['um', 'uh', 'er', 'ah', 'like', 'basically', 'actually', 'literally', 'so', 'well', 'right', 'okay', 'and', 'the', 'you', 'know', 'just', 'really', 'very'];
+                const fillerCount = fillerWords.reduce((count, word) => count + (this.wordFrequency[word] || 0), 0);
+                const fillerPercentage = this.wordCount > 0 ? ((fillerCount / this.wordCount) * 100).toFixed(1) : '0.0';
+                
+                const sortedWords = Object.entries(this.wordFrequency)
+                    .filter(([word, count]) => word.length > 2) // Only include words longer than 2 characters
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 50);
+                
+                if (sortedWords.length === 0) {
+                    alert('No words to create word cloud from.');
+                    return;
+                }
+                
+                // Create visual word cloud HTML
+                const maxCount = sortedWords[0][1];
+                const minCount = sortedWords[sortedWords.length - 1][1];
+                
+                let wordCloudHTML = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f8f9fa; 
+        }
+        .header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            text-align: center;
+        }
+        .stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .stat-box { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            text-align: center; 
+        }
+        .stat-value { 
+            font-size: 2em; 
+            font-weight: bold; 
+            color: #667eea; 
+        }
+        .stat-label { 
+            color: #666; 
+            font-size: 0.9em; 
+            margin-top: 5px; 
+        }
+        .word-cloud { 
+            text-align: center; 
+            line-height: 1.6; 
+            padding: 30px; 
+            background: white; 
+            border-radius: 15px; 
+            margin: 20px 0; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            min-height: 400px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .word-item {
+            display: inline-block;
+            margin: 3px 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: transform 0.2s;
+            cursor: default;
+        }
+        .word-item:hover {
+            transform: scale(1.1);
+        }
+        .filler-word {
+            color: #e74c3c !important;
+            background: rgba(231, 76, 60, 0.1);
+            font-weight: bold;
+        }
+        .important-word {
+            color: #2ecc71 !important;
+            background: rgba(46, 204, 113, 0.1);
+            font-weight: bold;
+        }
+        .normal-word {
+            color: #3498db !important;
+            background: rgba(52, 152, 219, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗣️ Call Analytics Word Cloud</h1>
+        <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-value">${duration}</div>
+            <div class="stat-label">Minutes</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">${this.wordCount}</div>
+            <div class="stat-label">Total Words</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">${avgWPM}</div>
+            <div class="stat-label">Average WPM</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-value">${fillerPercentage}%</div>
+            <div class="stat-label">Filler Words</div>
+        </div>
+    </div>
+    
+    <div class="word-cloud">
+`;
+                
+                // Generate word cloud with varying sizes
+                sortedWords.forEach(([word, count]) => {
+                    // Calculate font size based on frequency (12px to 72px)
+                    const fontSize = Math.max(12, Math.min(72, 12 + ((count - minCount) / (maxCount - minCount)) * 60));
+                    
+                    // Determine word type and styling
+                    const isFiller = fillerWords.includes(word.toLowerCase());
+                    const isImportant = count >= maxCount * 0.7; // Top 30% most frequent
+                    
+                    let wordClass = 'normal-word';
+                    if (isFiller) {
+                        wordClass = 'filler-word';
+                    } else if (isImportant) {
+                        wordClass = 'important-word';
+                    }
+                    
+                    // Add some visual variety with rotation and positioning
+                    const rotation = Math.random() * 20 - 10; // -10 to +10 degrees
+                    const opacity = Math.max(0.7, Math.min(1, 0.5 + (count / maxCount) * 0.5));
+                    
+                    wordCloudHTML += `
+        <span class="word-item ${wordClass}" 
+              style="font-size: ${fontSize}px; 
+                     transform: rotate(${rotation}deg); 
+                     opacity: ${opacity};
+                     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);" 
+              title="${word}: used ${count} time${count > 1 ? 's' : ''}">
+            ${word.toUpperCase()}
+        </span>`;
+                });
+                
+                wordCloudHTML += `
+    </div>
+    
+    <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h3>Legend:</h3>
+        <p><span class="word-item filler-word" style="font-size: 16px;">RED WORDS</span> = Filler words (um, like, basically, etc.)</p>
+        <p><span class="word-item important-word" style="font-size: 16px;">GREEN WORDS</span> = Most frequently used words</p>
+        <p><span class="word-item normal-word" style="font-size: 16px;">BLUE WORDS</span> = Regular vocabulary</p>
+        <p><strong>Word size</strong> = Frequency of use (bigger = used more often)</p>
+    </div>
+    
+    <div style="margin-top: 20px; padding: 15px; background: #ecf0f1; border-radius: 8px; text-align: center; color: #7f8c8d;">
+        <small>Generated by LiM Call Analytics Tool</small>
+    </div>
+</body>
+</html>`;
+                
+                // Create a new window with the word cloud
+                const wordCloudWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
+                if (wordCloudWindow) {
+                    wordCloudWindow.document.write(wordCloudHTML);
+                    wordCloudWindow.document.close();
+                    
+                    // Also prepare email with simplified text version
+                    const subject = `🗣️ Call Analytics Word Cloud Summary - ${new Date().toLocaleDateString()}`;
+                    const textEmailContent = `📞 CALL ANALYTICS SUMMARY\n\nDate: ${new Date().toLocaleDateString()}\nDuration: ${duration} min\nWords: ${this.wordCount}\nWPM: ${avgWPM}\nFiller: ${fillerPercentage}%\n\nTOP WORDS:\n${sortedWords.map(([word, count]) => `${word.toUpperCase()}(${count})`).join(' ')}\n\nView the visual word cloud in the popup window for a better experience!`;
+                    
+                    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textEmailContent)}`;
+                    
+                    setTimeout(() => {
+                        try {
+                            window.open(mailtoLink);
+                            alert('✅ Visual word cloud opened in new window! Email client will also open with summary.');
+                        } catch (error) {
+                            console.error('Email error:', error);
+                            alert('✅ Visual word cloud opened in new window! Copy the URL to share or save.');
+                        }
+                    }, 1000);
+                } else {
+                    alert('Please allow popups to view the visual word cloud, or copy the data from the console.');
+                    console.log('Word Cloud HTML:', wordCloudHTML);
+                }
+            }
+        }
+
+        // Initialize the app controller
+        window.appController = new AppController();
+
+        console.log('✅ Wide Layout Call Analytics loaded!');
+    </script>
+</body>
+</html>
